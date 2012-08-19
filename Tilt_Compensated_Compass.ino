@@ -44,11 +44,11 @@ void loop(){
   }
   
   //Print out values of each axis
-  Serial.print("x: ");
+  Serial.print("magnometer values x,y,z: ");
   Serial.print(mag_x);
-  Serial.print("  y: ");
+  Serial.print(" ");
   Serial.print(mag_y);
-  Serial.print("  z: ");
+  Serial.print(" ");
   Serial.println(mag_z);
   
   accel_x = analogRead(0);       // read analog input pin 0
