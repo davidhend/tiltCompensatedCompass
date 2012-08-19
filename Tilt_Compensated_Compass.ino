@@ -1,11 +1,4 @@
 /*
-An Arduino code example for interfacing with the HMC5883
-
-by: Jordan McConnell
- SparkFun Electronics
- created on: 6/30/11
- license: OSHW 1.0, http://freedomdefined.org/OSHW
-
 Analog input 4 I2C SDA
 Analog input 5 I2C SCL
 */
