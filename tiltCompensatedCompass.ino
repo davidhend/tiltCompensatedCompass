@@ -102,31 +102,14 @@ void loop(){
     mag_y |= Wire.read(); //Y lsb
   }
 
-  //Print out values of each axis
-  //Serial.print("magnometer values x,y,z: ");
-  //Serial.print(mag_x);
-  //Serial.print(" ");
-  //Serial.print(mag_y);
-  //Serial.print(" ");
-  //Serial.println(mag_z);
-
   accel_x = analogRead(accel_x_axis); // read analog input pin 5
   accel_y = analogRead(accel_y_axis); // read analog input pin 6
   accel_z = analogRead(accel_z_axis); // read analog input pin 7
 
-  //Serial.print("accelerations are x, y, z: ");
-  //Serial.print(accel_x, DEC); // print the acceleration in the X axis
-  //Serial.print(" "); // prints a space between the numbers
-  //Serial.print(accel_y, DEC); // print the acceleration in the Y axis
-  //Serial.print(" "); // prints a space between the numbers
-  //Serial.println(accel_z, DEC); // print the acceleration in the Z axis
-
-    FilterAD();
+  FilterAD();
   AD2Degree();
   getAzimuth();
   Send2Com();
-
-  delay(250);
 }
 
 void Send2Com()
