@@ -1,17 +1,26 @@
 /*
 Analog input 4 I2C SDA
- Analog input 5 I2C SCL
- */
+Analog input 5 I2C SCL
+*/
 
 #include <Wire.h> //I2C Arduino Library
 #include <math.h>
 
 #define address 0x1E //0011110b, I2C 7bit address of HMC5883
 
-int accel_x = 0, accel_y = 0, accel_z = 0; //accelerometer triple axis data
-int mag_x = 0,mag_y = 0,mag_z = 0; //magnometer triple axis data
+//accelerometer triple axis raw data
+int accel_x = 0;
+int accel_y = 0;
+int accel_z = 0; 
 
-int accel_x_axis = 5, accel_y_axis = 6, accel_z_axis = 7; //X = Pin 5, Y = Pin 6, Z = Pin 7
+//magnometer triple axis raw data
+int mag_x = 0;
+int mag_y = 0;
+int mag_z = 0; 
+
+int accel_x_axis = 5; //X = Pin 5
+int accel_y_axis = 6; //Y = Pin 6
+int accel_z_axis = 7; //Z = Pin 7
 
 //by increasing alphaAccel the response will become faster
 //but the noise will increae [alpha must be between 0 and 1]
@@ -26,8 +35,6 @@ float Yaw=0;
 int xRaw=0;
 int yRaw=0;
 int zRaw=0;
-
-int accel_x_f = 0, accel_y_f = 0, accel_z_f = 0;
 
 unsigned int xOffset=0;
 unsigned int yOffset=0;
@@ -62,12 +69,14 @@ float yMagnetMap=0;
 float zMagnetMap=0;
 
 float YawU;
+float Azimuth;
+int count = 0;
 
 void setup(){
   //Initialize Serial and I2C communications
   Serial.begin(9600);
   Wire.begin();
-
+  
   //Put the HMC5883 IC into the correct operating mode
   Wire.beginTransmission(address); //open communication with HMC5883
   Wire.write(0x02); //select mode register
@@ -82,9 +91,9 @@ void setup(){
   //http://www.freescale.com/files/sensors/doc/app_note/AN3447.pdf
 }
 
-void loop(){
-
-
+void loop()
+{
+  
   //Tell the HMC5883 where to begin reading data
   Wire.beginTransmission(address);
   Wire.write(0x03); //select register 3, X MSB register
@@ -110,6 +119,7 @@ void loop(){
   AD2Degree();
   getAzimuth();
   Send2Com();
+  
 }
 
 void Send2Com()
@@ -122,8 +132,8 @@ void Send2Com()
   Serial.print(" Yaw: ");
   Serial.print(int(Yaw));
 
-  Serial.print(" YawU: ");
-  Serial.println(int(YawU));
+  Serial.print(" Azimuth: ");
+  Serial.println(int(Azimuth));
   delay(50);
 }
 
@@ -168,6 +178,13 @@ void getAzimuth()
   //http://www.ssec.honeywell.com/magnetic/datasheets/lowcost.pdf
   Yaw=atan2( (-yMagnetMap*cos(Roll) + zMagnetMap*sin(Roll) ) , xMagnetMap*cos(Pitch) + zMagnetMap*sin(Pitch)*sin(Roll)+ zMagnetMap*sin(Pitch)*cos(Roll)) *180/PI;
   YawU=atan2(-yMagnetMap, xMagnetMap) *180/PI;
+  
+  //correct for 360 degrees 
+  if(YawU <= -1 && YawU >= -180){
+    Azimuth = map(YawU, -180, -1, 1, 180) + 180;
+  }else{
+    Azimuth = YawU;
+  }
 }
 
 
@@ -179,9 +196,9 @@ void AD2Degree()
   // to add/subtract +1 depending on the orientation of the accelerometer
   // (like me on the zAccel)
   // they are not necessary, but are useful for debugging
-  //accel_x=xFiltered *3.3 / (1023.0*0.8);      
-  //accel_y=yFiltered *3.3 / (1023.0*0.8);      
-  //accel_z=zFiltered *3.3 / (1023.0*0.8)+1.0;
+  //xAccel = xFiltered *3.3 / (1023.0*0.8);      
+  //yAccel = yFiltered *3.3 / (1023.0*0.8);      
+  //zAccel = zFiltered *3.3 / (1023.0*0.8)+1.0;
 
   // Calculate Pitch and Roll (compare Application Note AN3461 from Freescale
   // http://www.freescale.com/files/sensors/doc/app_note/AN3461.pdf
